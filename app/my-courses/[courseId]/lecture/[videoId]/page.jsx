@@ -125,7 +125,7 @@ export default function LecturePage() {
 
         try {
             // USE NATIVE FETCH INSTEAD OF AXIOS FOR STREAMING
-            const response = await fetch(`${process.env.REACT_APP_API_URL || "http://localhost:3000/api"}/ai/ask-tutor-stream`, {
+            const response = await fetch(`${process.env.REACT_APP_API_URL || "https://quiz-system-1ds3.onrender.com/api"}/ai/ask-tutor-stream`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
