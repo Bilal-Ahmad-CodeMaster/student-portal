@@ -12,10 +12,7 @@ export default function AppLayoutContent({ children }) {
     const pathname = usePathname();
     const router = useRouter();
 
-    // Check if the current page is a student lecture page
-    // This matches: /student/course/[id] or /course/[id]
-    const isLecturePage = pathname.includes("/course/");
-
+    const isLecturePage = pathname.includes("/lecture/") || pathname.includes("/course/");
     useEffect(() => {
         if (!loading) {
             if (user && pathname === "/login") {
@@ -38,11 +35,13 @@ export default function AppLayoutContent({ children }) {
                 <div className="p-4 flex items-center gap-4 bg-[#111827]/50 border-b border-slate-800">
                     <button
                         onClick={() => router.back()}
-                        className="p-2 hover:bg-slate-800 rounded-full text-white transition-all border border-slate-700"
+                        className="p-2 hover:bg-slate-800 rounded-full text-white transition-all border border-slate-700 flex items-center justify-center"
                     >
                         <ArrowLeft size={20} />
                     </button>
-                    <span className="text-slate-400 text-xs font-bold uppercase tracking-widest">Back to Dashboard</span>
+                    <span className="text-slate-400 text-xs font-bold uppercase tracking-widest">
+                        Exit Lecture Mode
+                    </span>
                 </div>
                 <main className="flex-1 overflow-y-auto custom-scrollbar">
                     {children}
@@ -50,7 +49,6 @@ export default function AppLayoutContent({ children }) {
             </div>
         );
     }
-
     // --- STANDARD DASHBOARD LAYOUT ---
     return (
         <div className="flex h-screen bg-slate-50 overflow-hidden text-slate-900">

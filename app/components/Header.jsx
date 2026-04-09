@@ -35,9 +35,9 @@ export default function Header() {
                         </div>
                         <div className="w-9 h-9 rounded-full border border-slate-200 overflow-hidden ring-2 ring-transparent group-hover:ring-slate-100 transition-all">
                             <img
-                                src={user?.picture || "/default-avatar.png"}
+                                src={user?.picture || "/default-avatar.png"} 
                                 className="w-full h-full object-cover"
-                                alt="profile"
+                                alt="profile" 
                             />
                         </div>
                         <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${showDropdown ? 'rotate-180' : ''}`} />

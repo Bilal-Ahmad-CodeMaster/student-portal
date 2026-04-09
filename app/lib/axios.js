@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL:
-    process.env.NEXT_PUBLIC_API_URL || "https://quiz-system-1ds3.onrender.com/api",
+  baseURL: "http://localhost:3000/api",
+  // process.env.NEXT_PUBLIC_API_URL || "https://quiz-system-1ds3.onrender.com/api",
   headers: {
     "Content-Type": "application/json",
   },

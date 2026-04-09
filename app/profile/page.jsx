@@ -68,7 +68,7 @@ export default function ProfilePage() {
         <div className="relative group">
           <div className="w-32 h-32 rounded-full border-4 border-slate-100 overflow-hidden shrink-0 bg-slate-200">
             <img
-              src={selectedFile ? URL.createObjectURL(selectedFile) : (user?.picture || "/avatar.png")}
+              src={selectedFile ? URL.createObjectURL(selectedFile) : (`${user?.picture}` || "/avatar.png")} 
               className="w-full h-full object-cover"
             />
           </div>

@@ -1,27 +1,28 @@
 "use client";
 import { useEffect, useState } from "react";
 import api from "@/app/lib/axios";
-import { PlayCircle, Clock, BookOpen, Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation"; // 1. Import useRouter
+import { PlayCircle, Clock, BookOpen, Loader2, X, Play } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function StudentCoursesPage() {
     const [courses, setCourses] = useState([]);
     const [loading, setLoading] = useState(true);
-    const router = useRouter(); // 2. Initialize router
+    const [selectedCourse, setSelectedCourse] = useState(null); // Track course for modal
+    const router = useRouter();
 
     useEffect(() => {
-        // Fetching all courses (recommend filtering by user ID on backend later)
         api.get("/course/my-assigned").then(res => {
             setCourses(res.data.data.courses);
             setLoading(false);
-        }).catch(() => {
-            setLoading(false);
-        });
+        }).catch(() => setLoading(false));
     }, []);
 
-    // 3. Navigation handler
-    const handleStartLearning = (courseId) => {
-        router.push(`/student/course/${courseId}`);
+    const openVideoModal = (course) => setSelectedCourse(course);
+    const closeVideoModal = () => setSelectedCourse(null);
+
+    const handleStartVideo = (courseId, videoId) => {
+        // REMOVED 'student/course' and replaced with 'my-courses'
+        router.push(`/my-courses/${courseId}/lecture/${videoId}`);
     };
 
     if (loading) {
@@ -33,54 +34,61 @@ export default function StudentCoursesPage() {
     }
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
-            <div>
-                <h1 className="text-3xl font-black text-slate-900 tracking-tight">Welcome back!</h1>
-                <p className="text-slate-500 font-medium">Pick up where you left off in your enrolled courses.</p>
-            </div>
+        <div className="space-y-8 p-6">
+            <h1 className="text-3xl font-black text-slate-900">My Courses</h1>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {courses.length > 0 ? (
-                    courses.map((course) => (
-                        <div
-                            key={course._id}
-                            className="bg-white rounded-[2.5rem] p-6 shadow-xl shadow-slate-200/50 border border-slate-100 flex flex-col group hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300"
+                {courses.map((course) => (
+                    <div key={course._id} className="bg-white rounded-[2rem] p-6 shadow-lg border border-slate-100 flex flex-col">
+                        <img src={course.coursePic} className="w-full h-40 object-cover rounded-xl mb-4" alt={course.title} />
+                        <h3 className="text-xl font-bold mb-4">{course.title}</h3>
+                        <button
+                            onClick={() => openVideoModal(course)}
+                            className="mt-auto w-full py-3 bg-blue-600 text-white rounded-xl font-bold flex items-center justify-center gap-2"
                         >
-                            <div className="w-full h-44 rounded-[2rem] overflow-hidden bg-slate-100 mb-5 relative">
-                                {course.coursePic ? (
-                                    <img src={course.coursePic} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt={course.title} />
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-slate-300">
-                                        <BookOpen size={48} />
-                                    </div>
-                                )}
-                                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors pointer-events-none" />
+                            <PlayCircle size={18} /> View Lectures
+                        </button>
+                    </div>
+                ))}
+            </div>
+
+            {/* VIDEO SELECTION MODAL */}
+            {selectedCourse && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-[2.5rem] w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col shadow-2xl">
+                        <div className="p-6 border-b flex justify-between items-center bg-slate-50">
+                            <div>
+                                <h2 className="text-xl font-black">{selectedCourse.title}</h2>
+                                <p className="text-sm text-slate-500">{selectedCourse.videos.length} Lectures available</p>
                             </div>
-
-                            <h3 className="text-xl font-extrabold text-slate-900 mb-2 truncate">{course.title}</h3>
-
-                            <div className="flex items-center gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-8">
-                                <span className="flex items-center gap-1.5"><Clock size={14} className="text-blue-500" /> {course.duration}</span>
-                                <span className="bg-blue-50 text-blue-600 px-2.5 py-1 rounded-lg border border-blue-100">{course.level}</span>
-                            </div>
-
-                            {/* 4. Connected the Click Event */}
-                            <button
-                                onClick={() => handleStartLearning(course._id)}
-                                className="mt-auto w-full py-4 bg-slate-900 text-white rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-blue-600 shadow-lg shadow-slate-900/20 hover:shadow-blue-600/30 transition-all active:scale-95"
-                            >
-                                <PlayCircle size={20} fill="currentColor" className="text-white" />
-                                Start Learning
+                            <button onClick={closeVideoModal} className="p-2 hover:bg-slate-200 rounded-full transition-colors">
+                                <X size={24} />
                             </button>
                         </div>
-                    ))
-                ) : (
-                    <div className="col-span-full py-20 text-center bg-white rounded-[3rem] border-2 border-dashed border-slate-100">
-                        <BookOpen className="mx-auto text-slate-200 mb-4" size={48} />
-                        <p className="text-slate-400 font-bold uppercase tracking-tighter">No active enrollments found.</p>
+
+                        <div className="overflow-y-auto p-6 space-y-3">
+                            {selectedCourse.videos.map((video, index) => (
+                                <div
+                                    key={video._id}
+                                    onClick={() => handleStartVideo(selectedCourse._id, video._id)}
+                                    className="group flex items-center justify-between p-4 rounded-2xl border border-slate-100 hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition-all"
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                            <span className="font-bold text-sm">{index + 1}</span>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-slate-800">{video.title}</h4>
+                                            <p className="text-xs text-slate-500 truncate max-w-xs">{video.description || "No description available"}</p>
+                                        </div>
+                                    </div>
+                                    <Play size={18} className="text-slate-300 group-hover:text-blue-600" />
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                )}
-            </div>
+                </div>
+            )}
         </div>
     );
 }
